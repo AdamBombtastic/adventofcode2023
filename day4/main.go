@@ -100,7 +100,8 @@ func solve1(cards []*Card) int {
 	return sum
 }
 
-// This is a very slow solution, but it works -- I could optimize, but I won't.
+// This is a very slow solution, but it works -- I optimize down below. (This is the one I solved it with)
+// THis solution is also over-complicated -- the faster version below is much simpler.
 func solve2(cards []*Card) int {
 	called := make(map[int]int)
 	toCall := make(map[int]int)
@@ -135,6 +136,30 @@ func solve2(cards []*Card) int {
 	return sum
 }
 
+// This is a faster solution that I wrote after solving the problem.
+func solve2_fast(cards []*Card) int {
+	callMap := make(map[int]int)
+	for index := range cards {
+		card := cards[index]
+		if callMap[index] == 0 {
+			callMap[index] = 1
+		}
+		nextCards := len(card.winningNumbers())
+		for i := index + 1; i < index+1+nextCards; i++ {
+			if callMap[i] == 0 {
+				callMap[i] = 1
+			}
+			callMap[i] = callMap[i] + callMap[index]
+		}
+	}
+	sum := 0
+	for _, v := range callMap {
+		sum += v
+	}
+
+	return sum
+}
+
 func main() {
 	input := loadText(os.Args[1])
 	cards := make([]*Card, 0)
@@ -145,7 +170,6 @@ func main() {
 	sum := solve1(cards)
 	println(sum)
 
-	// This solution is very slow, but it works -- I could optimize, but I won't.
-	sum = solve2(cards)
+	sum = solve2_fast(cards)
 	println(sum)
 }
